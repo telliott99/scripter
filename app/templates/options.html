@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{name}}</h1>
+<form method="post" action="/prog_run/{{name}}" >
+  
+<p>Please enter the values needed to run <br></p>
+<p>script {{name}}.py</br></p>
+<p>file:  <input type="text" name="fn" value="{{fn}}"></p>
+<p><input type="radio" name="opt" value="option1"> option1</p>
+<p><input type="radio" name="opt" value="option2"> option2</p>
+  
+<p><input type="submit" value="Submit form"></p>
+
+</form>
+{% endblock %}

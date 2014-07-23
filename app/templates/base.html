@@ -1,0 +1,20 @@
+<html>
+  <body>
+    <div>Scripter: &nbsp;
+        <a href="{{ url_for('index') }}">Home</a>
+    </div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <span style="color: red;">{{message}}</span></br>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    
+    {% block content %}
+    {% endblock %}
+  </body>
+</html>

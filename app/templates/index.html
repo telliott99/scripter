@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post" action="/prog_request">
+  
+<h3>Enter a file to work on:</h3>
+<p><input type="file" name="fn"> </p>
+<hr>
+<h3>Then pick a program:</h3>
+
+{% for script in script_list %}
+{% if script == default %}
+<p><input type="radio" name="prog" value="{{script}}" checked>  {{script}}</p>
+{% else %}
+<p><input type="radio" name="prog" value="{{script}}">  {{script}}</p>
+{% endif %}
+{% endfor %}
+    
+<p><input type="submit" value="Submit form"></p>
+    
+</form>
+
+{% endblock %}
