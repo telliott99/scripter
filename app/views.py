@@ -37,19 +37,21 @@ def index():
 def prog_request():
     print 'in: ', prog_request.__name__
     D = parse_request_data()
-    print 'request data: ', D
+    print 'request data: ', D.keys()
     prog = D['prog']
     if prog in not_implemented_yet:
         return render_template(
             "sorry.html",
             name=prog)
     if script_rqmts[prog]['fn']:
-        if not 'fn' in D:
+        if not 'fn' in D and D['seq'] == '':
             flash(file_msg)
             # retain users choice of program
             return render_index_template(
                 choice=prog)
     print 'program requested: ', prog
+    if not 'fn' in D:
+        D['fn'] = 'sequence entered directly'
     if script_rqmts[prog]['options']:
         return render_template(
                 "options.html",
