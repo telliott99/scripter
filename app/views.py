@@ -13,9 +13,9 @@ script_info = { 'demo': {'seq_needed':False,
 
                 'format_DNA':{ 'seq_needed':True,
                                'opt_needed':True,
-                               'option_form':'fmtDNA.html',
-                               'result_form':'text.html',
-                               'result_type':'txt', } }
+                               'option_form':'fmtDNAopts.html',
+                               'result_type':'txt',
+                               'result_form':'text.html' } }
 
 script_list = ['demo','format_DNA']
 default_choice = 'format_DNA'
@@ -48,42 +48,42 @@ def render_index_template(refresh=True):
 def index():
     return render_index_template()
 
-# returns form to get seq and options
-@app.route('/choose_prog', methods = ['POST'])
-def choose_prog():
-    print 'in: ', choose_prog.__name__
+# common route to deal with all forms
+@app.route('/dispatch', methods = ['POST'])
+def dispatch():
+    print 'in: ', dispatch.__name__
     D = helper.get_dict()
     D.update(helper.parse_request_data(request))
+    
     prog = D['prog']
     print 'prog', prog
-
-    D.update(script_info[prog])
-    # dispatch is a bit clunky
-    if D['seq_needed']:
-        # match the options form to the request
+    if not 'seq_needed' in D:
+        D.update(script_info[prog])
+    
+    seq_needed = D['seq_needed']
+    # modifiable
+    seq_requested = 'seq_requested' in D and D['seq_requested']
+    no_seq = not 'seq' in D or D['seq'] == ''
+    if seq_needed and no_seq:
+        if seq_requested:
+            # remind them and throw them out
+            flash(file_msg)
+            render_index_template(refresh=False)
+        # now ask, and retain users choice of program
+        D['seq_requested'] = True
         return render_template(
-                D['option_form'],
-                prog = prog)
-    else:
+            D['option_form'],
+            prog = prog)
+              
+    result = run_script.run(D)
+    if D['result_type'] == 'png':
         return render_template(
             D['result_form'],
             result_type=D['result_type'],
             url = url_for('static',filename=D['result_filename']),
             description="image showing result")
-
-# now deal with seq and options and run script
-@app.route('/input_options', methods = ['POST'])
-def input_options():
-    print 'in: ', input_options.__name__
-    D = helper.get_dict()
-    D.update(helper.parse_request_data(request))
-    if D['seq'] == '':
-        flash(file_msg)
-        # retain users choice of program
-        return render_index_template(
-            refresh=False)
-    result = run_script.run(D)
-    # for now, it's all text results here
-    return render_template(
-            D['result_form'],
-            mytext=result)
+            
+    if D['result_type'] == 'txt':
+        return render_template(
+                D['result_form'],
+                mytext=result)
