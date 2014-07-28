@@ -21,6 +21,11 @@ script_list = ['demo','format_DNA']
 default_choice = 'format_DNA'
 file_msg = 'A sequence is required:'
 
+script_list = ['demo','format_DNA']
+default_choice = 'format_DNA'
+file_msg = 'A sequence is required:'
+seq_progs = ['format_DNA']
+
 def render_index_template(refresh=True):
     if refresh:
     # we're starting from the beginning
@@ -29,7 +34,6 @@ def render_index_template(refresh=True):
     else:
     # script has already been chosen
     # prompting because we didn't get sequence
-        # a global dictionary to stash sequence, etc., defined in helper
         D = helper.get_dict()
         print 'in render_index_template:  D', D
         default = D['prog']
@@ -38,13 +42,13 @@ def render_index_template(refresh=True):
         script_list = script_list,
         default=default)          
 
-# index has a form that lists scripts
+# index shows form with scripts listed
 @app.route('/', methods = ['GET'])
 @app.route('/index', methods = ['GET'])
 def index():
     return render_index_template()
 
-# returns form to get seq and options, if necessary
+# returns form to get seq and options
 @app.route('/choose_prog', methods = ['POST'])
 def choose_prog():
     print 'in: ', choose_prog.__name__
@@ -52,6 +56,7 @@ def choose_prog():
     D.update(helper.parse_request_data(request))
     prog = D['prog']
     print 'prog', prog
+
     D.update(script_info[prog])
     # dispatch is a bit clunky
     if D['seq_needed']:
