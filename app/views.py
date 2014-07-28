@@ -5,26 +5,26 @@ from flask import flash, redirect, url_for
 from app import app, run_script
 
 import helper
-script_info = { 'demo': {'seq_needed':False,
-                         'opt_needed':False,
-                         'result_type':'png',
-                         'result_form':'image.html',
-                         'result_filename':'info.png' },
+script_info = { 
+    'demo': {'seq_needed':False,
+             'option_form':None,
+             'result_type':'png',
+             'result_form':'image.html',
+             'result_filename':'info.png' },
 
-                'format_DNA':{ 'seq_needed':True,
-                               'opt_needed':True,
-                               'option_form':'fmtDNAopts.html',
-                               'result_type':'txt',
-                               'result_form':'text.html' } }
+    'format_DNA':{ 'seq_needed':True,
+                   'option_form':'fmtDNAopts.html',
+                   'result_type':'txt',
+                   'result_form':'text.html' },
+                   
+    'translate':{ 'seq_needed':True,
+                  'option_form':'fmtDNAopts.html',
+                  'result_type':'txt',
+                  'result_form':'text.html' } }
 
-script_list = ['demo','format_DNA']
+script_list = ['demo','format_DNA','translate']
 default_choice = 'format_DNA'
 file_msg = 'A sequence is required:'
-
-script_list = ['demo','format_DNA']
-default_choice = 'format_DNA'
-file_msg = 'A sequence is required:'
-seq_progs = ['format_DNA']
 
 def render_index_template(refresh=True):
     if refresh:
@@ -69,13 +69,20 @@ def dispatch():
             # remind them and throw them out
             flash(file_msg)
             render_index_template(refresh=False)
+            
         # now ask, and retain users choice of program
         D['seq_requested'] = True
         return render_template(
             D['option_form'],
             prog = prog)
-              
-    result = run_script.run(D)
+    
+    try:
+        result = run_script.run(D)
+    except:
+        return render_template(
+            'error.html',
+            name = prog)
+        
     if D['result_type'] == 'png':
         return render_template(
             D['result_form'],
