@@ -3,10 +3,6 @@
 {% block content %}
 <h3>Result:</h3>
 
-{% if result_type == "img" %}
 <img src="{{url}}" alt="{{description}}">
-{% elif result_type == "txt" %}
-<p>data:  {{data}}</p>
-{% endif %}
 
 {% endblock %}
