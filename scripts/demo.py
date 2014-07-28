@@ -5,4 +5,4 @@ def run(D):
     print 'dict:'
     for k in D:
         print k, '=', D[k]
-    return 'info.png'
+    return 'png', 'info.png'

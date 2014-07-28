@@ -1,81 +1,76 @@
 import os
+from subprocess import call
 from flask import render_template, request
 from flask import flash, redirect, url_for
 from app import app, run_script
 
-script_list = ['demo', 'simple', 'better', 'awesome']
-not_implemented_yet = ['awesome']
-               
-script_rqmts = {'demo':{'fn':False,'options':False}, 
-                'simple':{'fn':True,'options':True},
-                'better':{'fn':True,'options':True}}
-                
-file_msg = 'A file name or sequence is required:'
+import helper
+templateD = {'format_DNA':'fmtDNA.html'}
 
-def parse_request_data():
-    data = request.get_data()
-    print 'request', data
-    D = dict()
-    for t in data.split('&'):
-        k,v = t.strip().split('=')
-        D[k] = v
-    return D
+script_list = ['demo','format_DNA']
+default_choice = 'format_DNA'
+file_msg = 'A sequence is required:'
+seq_progs = ['format_DNA']
 
-def render_index_template(choice='simple'):
+def render_index_template(refresh=True):
+    if refresh:
+    # we're starting from the beginning
+        helper.set_dict({})
+        default=default_choice
+    else:
+    # we have a choice of script
+    # prompting because we didn't get sequence
+        D = helper.get_dict()
+        print 'in render_index_template:  D', D
+        default = D['prog']
     return render_template(
         "index.html",
         script_list = script_list,
-        default=choice)
+        default=default)          
 
+# index shows form with scripts listed
 @app.route('/', methods = ['GET'])
 @app.route('/index', methods = ['GET'])
 def index():
-    print 'in: ', index.__name__
     return render_index_template()
-        
-@app.route('/prog_request', methods = ['POST'])
-def prog_request():
-    print 'in: ', prog_request.__name__
-    D = parse_request_data()
-    print 'request data: ', D.keys()
+
+# returns form to get seq and options
+@app.route('/choose_prog', methods = ['POST'])
+def choose_prog():
+    print 'in: ', choose_prog.__name__
+    D = helper.get_dict()
+    D.update(helper.parse_request_data(request))
     prog = D['prog']
-    if prog in not_implemented_yet:
+    print 'prog', prog
+    # ugly, but for now:
+    D['seq_required'] = prog in seq_progs
+    if D['seq_required']:
+        # match the options form to the request
         return render_template(
-            "sorry.html",
-            name=prog)
-    if script_rqmts[prog]['fn']:
-        if not 'fn' in D and D['seq'] == '':
-            flash(file_msg)
-            # retain users choice of program
-            return render_index_template(
-                choice=prog)
-    print 'program requested: ', prog
-    if not 'fn' in D:
-        D['fn'] = 'sequence entered directly'
-    if script_rqmts[prog]['options']:
+                templateD[prog],
+                prog = prog)
+    else:
         return render_template(
-                "options.html",
-                name=prog,
-                fn = D['fn'])
-    # no options needed for 'demo'
-    return prog_run(prog)
+            'image.html',
+            result_type='img',
+            url = url_for('static',filename='info.png'),
+            result='.png', 
+            description="image showing result")
 
-@app.route('/prog_run/<pname>', methods = ['POST'])
-def prog_run(pname):
-    print 'in: ', prog_run.__name__, ', pname'
-    D = parse_request_data()
-    print 'D', D
-    D['prog'] = pname
-
-    # returns a filename where results are stored
-    result = run_script.run(D)
-    url = url_for('static', filename=result)
-    return render_template(
-        "result.html",
-        result_type = 'img',
-        url = url,
-        description = 'image showing result')
-
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('404.html'), 404
+# now deal with seq and options and run script
+@app.route('/input_options', methods = ['POST'])
+def input_options():
+    print 'in: ', input_options.__name__
+    D = helper.get_dict()
+    D.update(helper.parse_request_data(request))
+    if D['seq'] == '':
+        flash(file_msg)
+        # retain users choice of program
+        return render_index_template(
+            refresh=False)
+    result_type,result = run_script.run(D)
+    if result_type is 'txt':
+        return render_template(
+            'text.html',
+            mytext=result)
+        
