@@ -5,24 +5,9 @@ from flask import flash, redirect, url_for
 from app import app, run_script
 
 import helper
-script_info = { 
-    'demo': {'seq_needed':False,
-             'option_form':None,
-             'result_type':'png',
-             'result_form':'image.html',
-             'result_filename':'info.png' },
+from helper import script_info
 
-    'format_DNA':{ 'seq_needed':True,
-                   'option_form':'fmtDNAopts.html',
-                   'result_type':'txt',
-                   'result_form':'text.html' },
-                   
-    'translate':{ 'seq_needed':True,
-                  'option_form':'fmtDNAopts.html',
-                  'result_type':'txt',
-                  'result_form':'text.html' } }
-
-script_list = ['demo','format_DNA','translate']
+script_list = ['demo','format_DNA','translate','extra_sites']
 default_choice = 'format_DNA'
 file_msg = 'A sequence is required:'
 
@@ -57,40 +42,51 @@ def dispatch():
     
     prog = D['prog']
     print 'prog', prog
+    
+    # all entries in script_info have this key:
     if not 'seq_needed' in D:
         D.update(script_info[prog])
     
     seq_needed = D['seq_needed']
-    # modifiable
-    seq_requested = 'seq_requested' in D and D['seq_requested']
+    # did we already ask for a sequence?
+    seq_requested = D.get('seq_requested',False)
     no_seq = not 'seq' in D or D['seq'] == ''
+    
     if seq_needed and no_seq:
         if seq_requested:
-            # remind them and throw them out
+            # remind them, but also go back to index page
             flash(file_msg)
             render_index_template(refresh=False)
             
-        # now ask, and retain users choice of program
+        # so ask them, retaining users choice of prog
         D['seq_requested'] = True
         return render_template(
             D['option_form'],
             prog = prog)
     
-    try:
+    # minimalist error handling, user can't fix this anyway
+    debug=True
+    if debug:
         result = run_script.run(D)
-    except:
-        return render_template(
-            'error.html',
-            name = prog)
-        
-    if D['result_type'] == 'png':
+    else:
+        try:
+            result = run_script.run(D)
+        except:
+            return render_template(
+                'error.html',
+                name = prog)
+    
+    result_type = D['result_type']
+    if result_type == 'png':
         return render_template(
             D['result_form'],
-            result_type=D['result_type'],
-            url = url_for('static',filename=D['result_filename']),
+            result_type=result_type,
+            url = url_for('static',
+            filename=D['result_filename']),
             description="image showing result")
-            
-    if D['result_type'] == 'txt':
+    
+    # simple if OK, given return above     
+    if result_type == 'txt':
         return render_template(
                 D['result_form'],
                 mytext=result)

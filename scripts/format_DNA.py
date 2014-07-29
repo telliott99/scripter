@@ -42,7 +42,7 @@ def run(D):
     # for now, assuming it is a sequence and not filename
     seq = D['seq']
     if seq.startswith('>') or seq.startswith('%3E'):
-        title, seq = split_seq(seq)
+        title, seq = ut.split_seq(seq)
     result = pretty_fmt(seq)
     return result
         

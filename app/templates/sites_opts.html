@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{name}}</h1>
+<form method="post" action="/dispatch">
+  
+<h3>Paste your sequence here:</h3>
+<textarea name="seq" rows="10" cols="60" style="resize: none;" data-role="none"></textarea>
+<hr>
+
+<p>Please enter the values needed to run <b>{{prog}}.py</b></br></p>
+<p><input type="radio" name="opt" value="option1"> option1</p>
+<p><input type="radio" name="opt" value="option2"> option2</p>
+  
+<p><input type="submit" value="Submit form"></p>
+
+</form>
+{% endblock %}

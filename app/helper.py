@@ -21,5 +21,30 @@ def set_dict(input):
     global D
     D = input
 
+# notice we execute upon import
 set_dict({})
+
+script_info = { 
+    'demo': {'seq_needed':False,
+             'option_form':None,
+             'result_type':'png',
+             'result_form':'image.html',
+             'result_filename':'info.png' },
+
+    'format_DNA':{ 'seq_needed':True,
+                   'option_form':'fmtDNAopts.html',
+                   'result_type':'txt',
+                   'result_form':'text.html' },
+                   
+    'translate':{ 'seq_needed':True,
+                  'option_form':'fmtDNAopts.html',
+                  'result_type':'txt',
+                  'result_form':'text.html' },
+                   
+    'extra_sites':{ 'seq_needed':True,
+                    'option_form':'sites_opts.html',
+                    'result_type':'txt',
+                    'result_form':'text.html' } 
+}
+
 
