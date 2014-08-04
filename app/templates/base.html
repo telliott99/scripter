@@ -1,7 +1,16 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Scripter</title>
+    <link rel="stylesheet" type="text/css" 
+    href={{ url_for("static", filename="style.css") }}
+  </head>
   <body>
+    <img src="{{ url_for("static", filename='working_dog.png') }}",   
+    height= "106", width="160", alt="{{"working_dog"}}" >
     <div>Scripter: &nbsp;
-        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('index') }}">Home</a> |
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}
