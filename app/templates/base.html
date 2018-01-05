@@ -7,11 +7,15 @@
     href={{ url_for("static", filename="style.css") }}
   </head>
   <body>
-    <img src="{{ url_for("static", filename='working_dog.png') }}",   
-    height= "106", width="160", alt="{{"working_dog"}}" >
-    <div>Scripter: &nbsp;
-        <a href="{{ url_for('index') }}">Home</a> |
-    </div>
+    <h1>
+      <img 
+        src="{{ url_for("static", filename='working_dog.png') }}",   
+        height= "106", width="160", 
+        alt="{{"working_dog"}}"
+    </h1>
+    <h2>Scripter: &nbsp;
+        <a href="{{ url_for('index') }}">Home</a>
+    </h2>
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
